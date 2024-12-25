@@ -1,42 +1,29 @@
 #include <iostream>
+#include <string>
+#include <random>
 #include <memory>
 #include <vector>
-#include <string>
+#include <windows.h>
 #include <fstream>
 #include <chrono>
-#include <limits>
 #include <thread>
-#include <Windows.h>
-#include <map>
-#include <SDL_image.h>
-#include <SDL_mixer.h>
 #include <SDL.h>
-#include <SDL_ttf.h>
-#include "MainHeader.hpp"
+#include "GameEngine.hpp"
+#include "Game.hpp"
 
-const int WINDOW_HEIGHT = 800; // global constants
-const int WINDOW_WIDTH = 800;
-const char* WINDOW_NAME = "Caliba";
+int main(int argc, char* argv[]) {
 
-
-// we must first initialise the framework, then create the window and finally render the graphics
-// i will use main instead of SDL_Main for portability
-
-
-
-int main(int argc, char** argv[]) {
-
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) { 
-        std::cerr << "SDL could not be initialised! Error caught: " << SDL_GetError() << std::endl;
+    // smart pointer because I don't want to worry about freeing memory
+    std::unique_ptr<GameEngine> game = std::make_unique<Game>();
+    if (!game->Initialise()) {
+        std::cerr << "Game Engine could not be initialised!" << std::endl;
         return -1;
-    } // checking to see if the SDL2 library can be initialised for processing video graphics
+    }
 
+    while (true) { // testing to fit window size
 
+    }
 
-
-
-
-
-
+    SDL_Quit();
     return 0;
 }

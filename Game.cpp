@@ -1,6 +1,3 @@
 #include <iostream>
-#include "MainHeader.hpp"
-
-
-
-
+#include <SDL.h>
+#include "Game.hpp"

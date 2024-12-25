@@ -70,6 +70,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Users\jed12\Desktop\SDL2\SDL2-2.30.10\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\jed12\Desktop\SDL2\SDL2-2.30.10\lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -104,13 +108,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\jed12\Desktop\SDL Files\SDL TTF\SDL2_ttf-2.22.0\include;C:\Users\jed12\Desktop\SDL Files\SDL Mixer\SDL2_mixer-2.8.0\include;C:\Users\jed12\Desktop\SDL Files\SDL Library\SDL2-2.30.10\include;C:\Users\jed12\Desktop\SDL Files\SDL Images\SDL2_image-2.8.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\jed12\Desktop\SDL Files\SDL TTF\SDL2_ttf-2.22.0\lib\x64;C:\Users\jed12\Desktop\SDL Files\SDL Mixer\SDL2_mixer-2.8.0\lib\x64;C:\Users\jed12\Desktop\SDL Files\SDL Library\SDL2-2.30.10\lib\x64;C:\Users\jed12\Desktop\SDL Files\SDL Images\SDL2_image-2.8.2\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/VERBOSE %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>C:\Users\jed12\Desktop\SDL2\SDL2-2.30.10\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,7 +140,8 @@
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MainHeader.hpp" />
+    <ClInclude Include="Game.hpp" />
+    <ClInclude Include="GameEngine.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
