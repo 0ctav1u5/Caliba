@@ -15,14 +15,16 @@ private:
 	const char* m_WINDOW_NAME = "Caliba";
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
-
 public:
 
 	virtual ~GameEngine(){
 		std::cout << "GameEngine has been destroyed!" << std::endl;
+		SDL_DestroyWindow(window);
+		SDL_Quit();
 	}
 
 	bool Initialise();
+	void GameLoop();
 
 };
 

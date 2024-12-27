@@ -24,12 +24,18 @@
     <ClCompile Include="GameEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Paddle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameEngine.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Paddle.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

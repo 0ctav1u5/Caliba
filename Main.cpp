@@ -19,11 +19,6 @@ int main(int argc, char* argv[]) {
         std::cerr << "Game Engine could not be initialised!" << std::endl;
         return -1;
     }
-
-    while (true) { // testing to fit window size
-
-    }
-
-    SDL_Quit();
+    game->GameLoop();
     return 0;
 }
