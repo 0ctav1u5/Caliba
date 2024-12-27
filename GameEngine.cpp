@@ -3,27 +3,25 @@
 #include <memory>
 #include "GameEngine.hpp"
 #include "Paddle.hpp"
+#include "Game.hpp"
 
 // boilerplate code for initialising framework, creating window and renderer
 bool GameEngine::Initialise() {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        std::cerr << "Error. Failed to initialise!" << std::endl;
+        Cleanup("Error. Failed to initialise!");
         return false;
     }
 
     window = SDL_CreateWindow(m_WINDOW_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         m_WINDOW_WIDTH, m_WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
     if (!window) {
-        std::cerr << "Error. Failed to create a window!" << std::endl;
-        SDL_Quit();
+        Cleanup("Error. Failed to create a window!");
         return false;
     }
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!renderer) {
-        std::cerr << "Error. Graphics could not be rendered!" << std::endl;
-        SDL_DestroyWindow(window);
-        SDL_Quit();
+        Cleanup("Error. Graphics could not be rendered!");
         return false;
     }
 
@@ -32,47 +30,62 @@ bool GameEngine::Initialise() {
 
 void GameEngine::GameLoop() {
     bool running = true;
-    int PlayerX = 200, PlayerY = 485;
-    const int Player_Width = 100, Player_Height = 10;
+    int PlayerX = 200, PlayerY = 485, PlayerWidth = 100, PlayerHeight = 10;
 
-    // PLAYER
-    std::unique_ptr<Paddle> player = std::make_unique<Paddle>
-        (PlayerX, PlayerY, Player_Width, Player_Height);
-    player->SetColour(0, 0, 255); // Sets the colour of the paddle to be blue
+    // Game -- Handles game events
+    std::unique_ptr<Game> game = std::make_unique<Game>();
+
+    // Player -- We can use this first paddle as our player
+    game->MakePaddle(PlayerX, PlayerY, PlayerWidth, PlayerHeight);
     
     
     SDL_Event e;
     const Uint8* keyboardState = SDL_GetKeyboardState(nullptr); // checks state to prevent lag
 
-    while (running) {
-        while (SDL_PollEvent(&e) != 0) { // 0 = no events to be processed
-            if (e.type == SDL_QUIT) {
-                running = false;
-            }
-            else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE) {
-                running = false;
-            }
+    const int FPS = 60; 
+    const int FrameDelay = 1000 / FPS; // Delay per frame in milliseconds
+    Uint32 FrameStart = 0;
+    int FrameTime = 0;
 
-            if (keyboardState[SDL_SCANCODE_LEFT]) { // Check if LEFT arrow is held
-                if (player->GetX() >= 10) { // Ensure paddle doesn't move off-screen
-                    player->Move(-10, 0);
-                }
-            }
-            if (keyboardState[SDL_SCANCODE_RIGHT]) { // Check if RIGHT arrow is held
-                if (player->GetX() + player->GetWidth() < m_WINDOW_WIDTH) { // Ensure paddle stays within bounds
-                    player->Move(10, 0);
-                }
-            }               
+
+
+    // PASS SDL_EVENT and std::unique_ptr<paddle> player
+
+    while (running) {
+        FrameStart = SDL_GetTicks();
+        while (SDL_PollEvent(&e) != 0) { // 0 = no events to be processed
+            game->HandleInput(game, e, running, keyboardState);
         }
         // BACKGROUND
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // R G B, Opaqueness
         SDL_RenderClear(renderer);                     // Clear the renderer once per frame
 
 
-        player->RenderPaddle(renderer); // Renders the player
+        game->GetPlayer()->RenderPaddle(renderer); // Renders the player
 
 
         SDL_RenderPresent(renderer); // Initial setup of background and paddle
+
+
+        // controlling framerate
+        FrameTime = SDL_GetTicks() - FrameStart; // Time taken for the frame
+        if (FrameDelay > FrameTime) {
+            SDL_Delay(FrameDelay - FrameTime); // Delay to maintain pre-determined FPS
+        }
     }
 }
 
+const int GameEngine::GetWindowWidth() {
+    return m_WINDOW_WIDTH;
+}
+
+void GameEngine::Cleanup(const std::string& errormsg) {
+    std::cerr << errormsg << std::endl;
+    if (renderer != nullptr) {
+        SDL_DestroyRenderer(renderer);  // Clean up renderer
+    }
+    if (window != nullptr) {
+        SDL_DestroyWindow(window);
+    }
+    SDL_Quit();
+}

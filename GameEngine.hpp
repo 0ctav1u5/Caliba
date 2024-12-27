@@ -19,12 +19,19 @@ public:
 
 	virtual ~GameEngine(){
 		std::cout << "GameEngine has been destroyed!" << std::endl;
-		SDL_DestroyWindow(window);
-		SDL_Quit();
+		if (renderer != nullptr) {
+			SDL_DestroyRenderer(renderer);
+		}
+		if (window != nullptr) {
+			SDL_DestroyWindow(window);
+		}
+		SDL_Quit(); // quits the SDL subsystem
 	}
 
 	bool Initialise();
 	void GameLoop();
+	const int GetWindowWidth();
+	void Cleanup(const std::string& errormsg);
 
 };
 
