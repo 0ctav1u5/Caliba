@@ -37,6 +37,8 @@ void GameEngine::GameLoop() {
 
     // Player -- We can use this first paddle as our player
     game->MakePaddle(PlayerX, PlayerY, PlayerWidth, PlayerHeight);
+
+
     
     
     SDL_Event e;
@@ -60,8 +62,8 @@ void GameEngine::GameLoop() {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // R G B, Opaqueness
         SDL_RenderClear(renderer);                     // Clear the renderer once per frame
 
-
-        game->GetPlayer()->RenderPaddle(renderer); // Renders the player
+        // renders the first paddle (This is player)
+        game->GetPaddles().front()->RenderPaddle(renderer); 
 
 
         SDL_RenderPresent(renderer); // Initial setup of background and paddle
@@ -77,6 +79,10 @@ void GameEngine::GameLoop() {
 
 const int GameEngine::GetWindowWidth() {
     return m_WINDOW_WIDTH;
+}
+
+SDL_Renderer* GameEngine::GetRenderer() const {
+    return renderer;
 }
 
 void GameEngine::Cleanup(const std::string& errormsg) {

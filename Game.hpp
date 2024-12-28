@@ -1,5 +1,6 @@
 #include <iostream>
 #include <SDL.h>
+#include <vector>
 #include "GameEngine.hpp"
 #include "Paddle.hpp"
 #ifndef GAME_HPP
@@ -12,22 +13,20 @@
 
 class Game : public GameEngine {
 private:
-	std::unique_ptr<Paddle> m_player;
+	std::vector<std::unique_ptr<Paddle>> m_Paddles;
 public:
 
-	Game() {
-		m_player = std::make_unique<Paddle>(200, 485, 100, 10);
-		m_player->SetColour(0, 0, 255); // Set the paddle color
-	}
+	Game() {}
 
 	~Game() {
 		std::cout << "Game has been destroyed!" << std::endl;
 	}
 
 	void MakePaddle(int PlayerX, int PlayerY, int Player_Width, int Player_Height);
-	const std::unique_ptr<Paddle>& GetPlayer() const;
+	const std::vector<std::unique_ptr<Paddle>>& GetPaddles() const;
 	void HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
-		bool& running, const Uint8* keyboardState);
+	bool& running, const Uint8* keyboardState);
+	void Render();
 };
 
 #endif

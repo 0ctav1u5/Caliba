@@ -31,7 +31,9 @@ public:
 	bool Initialise();
 	void GameLoop();
 	const int GetWindowWidth();
+	SDL_Renderer* GetRenderer() const;
 	void Cleanup(const std::string& errormsg);
+
 
 };
 
