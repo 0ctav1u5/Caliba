@@ -14,10 +14,10 @@ void Game::Render() {
 }
 
 void Game::MakePaddle(int PlayerX, int PlayerY, int Player_Width, int Player_Height) {
-    auto paddle = std::make_unique<Paddle>
+    auto paddle = std::make_unique<Paddle> // dynamically stored object
         (PlayerX, PlayerY, Player_Width, Player_Height);
     paddle->SetColour(0, 0, 255); // default colour of all paddles is blue
-    m_Paddles.push_back(std::move(paddle));
+    m_Paddles.push_back(std::move(paddle)); // stores new paddle on the vector
 }
 
 Paddle* Game::GetPaddle(int i) {
