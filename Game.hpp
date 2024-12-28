@@ -23,7 +23,7 @@ public:
 	}
 
 	void MakePaddle(int PlayerX, int PlayerY, int Player_Width, int Player_Height);
-	const std::vector<std::unique_ptr<Paddle>>& GetPaddles() const;
+	Paddle* GetPaddle(int i);
 	void HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
 	bool& running, const Uint8* keyboardState);
 	void Render();

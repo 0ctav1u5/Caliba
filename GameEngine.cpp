@@ -38,6 +38,11 @@ void GameEngine::GameLoop() {
     // Player -- We can use this first paddle as our player
     game->MakePaddle(PlayerX, PlayerY, PlayerWidth, PlayerHeight);
 
+    
+    game->MakePaddle(PlayerX, PlayerY - 480, PlayerWidth, PlayerHeight);
+    // default colour is blue, let's change it to red
+    game->GetPaddle(1)->SetColour(255, 0, 0);
+    // paddle stored at index 1 in the vector is now red
 
     
     
@@ -62,8 +67,9 @@ void GameEngine::GameLoop() {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // R G B, Opaqueness
         SDL_RenderClear(renderer);                     // Clear the renderer once per frame
 
-        // renders the first paddle (This is player)
-        game->GetPaddles().front()->RenderPaddle(renderer); 
+        // renders paddles
+        game->GetPaddle(0)->RenderPaddle(renderer); 
+        game->GetPaddle(1)->RenderPaddle(renderer);
 
 
         SDL_RenderPresent(renderer); // Initial setup of background and paddle

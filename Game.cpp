@@ -16,12 +16,15 @@ void Game::Render() {
 void Game::MakePaddle(int PlayerX, int PlayerY, int Player_Width, int Player_Height) {
     auto paddle = std::make_unique<Paddle>
         (PlayerX, PlayerY, Player_Width, Player_Height);
-    paddle->SetColour(0, 0, 255); // Sets the colour of the paddle to blue
+    paddle->SetColour(0, 0, 255); // default colour of all paddles is blue
     m_Paddles.push_back(std::move(paddle));
 }
 
-const std::vector<std::unique_ptr<Paddle>>& Game::GetPaddles() const {
-    return m_Paddles;
+Paddle* Game::GetPaddle(int i) {
+    if (i >= 0 && i < m_Paddles.size()) {
+        return m_Paddles[i].get();  // return raw pointer to the paddle
+    }
+    return nullptr;  // Return nullptr if index is out of bounds
 }
 
 void Game::HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
