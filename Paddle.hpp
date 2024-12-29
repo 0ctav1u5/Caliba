@@ -22,9 +22,8 @@ public:
 
 	// util
 	int GetX();
+	int GetY();
 	int GetWidth();
-
-
 
 };
 

@@ -3,6 +3,7 @@
 #include <memory>
 #include "GameEngine.hpp"
 #include "Paddle.hpp"
+#include "Bullet.hpp"
 #include "Game.hpp"
 
 // boilerplate code for initialising framework, creating window and renderer
@@ -40,52 +41,64 @@ void GameEngine::GameLoop() {
     // Game -- Handles game events
     std::unique_ptr<Game> game = std::make_unique<Game>();
 
-    // Player -- We can use this first paddle as our player
+    // PLAYER PADDLE
     game->MakePaddle(PlayerX, PlayerY, PlayerWidth, PlayerHeight);
 
-    
+    // AI PADDLE
     game->MakePaddle(PlayerX, PlayerY - 480, PlayerWidth, PlayerHeight);
-    // default colour is blue, let's change it to red
     game->GetPaddle(1)->SetColour(255, 0, 0);
-    // paddle stored at index 1 in the vector is now red
 
-    
-    
     SDL_Event e;
     const Uint8* keyboardState = SDL_GetKeyboardState(nullptr); // checks state to prevent lag
 
-    const int FPS = 60; 
-    const int FrameDelay = 1000 / FPS; // Delay per frame in milliseconds
+    const int FPS = 60;
+    const int FrameDelay = 1000 / FPS;
     Uint32 FrameStart = 0;
     int FrameTime = 0;
-
-
-
-    // PASS SDL_EVENT and std::unique_ptr<paddle> player
 
     while (running) {
         FrameStart = SDL_GetTicks();
         while (SDL_PollEvent(&e) != 0) { // 0 = no events to be processed
-            game->HandleInput(game, e, running, keyboardState);
+            game->SetCoolDown(300);
+            game->HandleInput(game, e, running, keyboardState, renderer);
         }
-        game->HandleAI(1); // handles the AI of the paddle at index 1
-        // BACKGROUND
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // R G B, Opaqueness
-        SDL_RenderClear(renderer);                     // Clear the renderer once per frame
 
-        // renders paddles
-        game->GetPaddle(0)->RenderPaddle(renderer); 
+        // Handle AI (if any AI exists)
+        game->HandleAI(1);
+
+
+
+        // Move and render bullets -- if no bullets then bullet count remains 0, thus no loop
+        for (int i = 0; i < game->GetBulletCount(); ++i) {
+            Bullet* bullet = game->GetBullet(i); // Use GetBullet() to access each bullet
+            if (bullet) {
+                bullet->Move(0, -5);  // Move bullet upwards
+            }
+        }
+
+        // Clear the screen and render everything
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
+        SDL_RenderClear(renderer);
+
+        // Render paddles
+        game->GetPaddle(0)->RenderPaddle(renderer);
         game->GetPaddle(1)->RenderPaddle(renderer);
+        
+        // Render bullets
+        for (int i = 0; i < game->GetBulletCount(); ++i) {
+            Bullet* bullet = game->GetBullet(i); // Use GetBullet() to access each bullet
+            if (bullet) {
+                bullet->RenderBullet(renderer);
+            }
+        }
 
+        // Update the screen
+        SDL_RenderPresent(renderer);
 
-        SDL_RenderPresent(renderer); // Initial setup of background and paddle
-
-
-        // controlling framerate
-        // GetTicks gives you the time since SDL_Init was called, it measures time
-        FrameTime = SDL_GetTicks() - FrameStart; // Time taken for the frame
+        // Control the frame rate
+        FrameTime = SDL_GetTicks() - FrameStart;
         if (FrameDelay > FrameTime) {
-            SDL_Delay(FrameDelay - FrameTime); // Delay to maintain pre-determined FPS
+            SDL_Delay(FrameDelay - FrameTime); // Delay to maintain constant FPS
         }
     }
 }
