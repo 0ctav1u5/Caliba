@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SDL.h>
 #include <memory>
+#include <random>
 #include "Game.hpp"
 #include "Paddle.hpp"
 
@@ -42,4 +43,26 @@ void Game::HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
                 m_Paddles[0]->Move(10, 0);
             }
         }
+}
+
+// paddlenum will be whatever paddle we wish to handle stored in the vector
+void Game::HandleAI(int paddlenum) {
+    static int direction = 1; // 1 for moving right, -1 for moving left
+    int speed = 5;           // Paddle speed per frame
+
+    // Get the current paddle position
+    int paddleX = m_Paddles[paddlenum]->GetX();
+    int paddleWidth = m_Paddles[paddlenum]->GetWidth();
+
+    // Reverse direction if paddle hits the screen edges
+    if (paddleX <= 0) {
+        direction = 1; // move paddle right
+    }
+    else if (paddleX + paddleWidth >= GetWindowWidth()) {
+        direction = -1; // move paddle left
+    }
+
+    // direction is either 1 (right) or -1 (left) and the speed is how quickly it moves
+    m_Paddles[paddlenum]->Move(direction * speed, 0);
+    // notice how the coords are (x, 0) because x is being changed
 }

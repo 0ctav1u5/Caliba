@@ -27,6 +27,9 @@ public:
 	void HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
 	bool& running, const Uint8* keyboardState);
 	void Render();
+
+
+	void HandleAI(int paddlenum); // handles AI
 };
 
 #endif

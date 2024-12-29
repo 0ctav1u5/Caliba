@@ -16,14 +16,14 @@ public:
 
 
 	void SetColour(int R, int G, int B);
-
 	void RenderPaddle(SDL_Renderer* renderer);
 
 	void Move(int changex, int changey);
 
+	// util
 	int GetX();
-
 	int GetWidth();
+
 
 
 };

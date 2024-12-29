@@ -1,6 +1,8 @@
 #include <iostream>
 #include <SDL.h>
+#include <random>
 #include "Paddle.hpp"
+#include "Game.hpp"
 
 
 void Paddle::SetColour(int R, int G, int B) { // sets members to params
@@ -19,7 +21,7 @@ void Paddle::RenderPaddle(SDL_Renderer* renderer) {
 
 void Paddle::Move(int changex, int changey) {
 	posx += changex; // - x moves left, + x moves right 
-	posy += changey; // - y moves up, + y moves down
+	// posy += changey; - y moves up, + y moves down
 }
 
 int Paddle::GetX() { 

@@ -28,6 +28,11 @@ bool GameEngine::Initialise() {
     return true;
 }
 
+
+// note - we have to create at least two paddles for this code to function
+// i will soon implement functionality which handles <2 paddles
+
+
 void GameEngine::GameLoop() {
     bool running = true;
     int PlayerX = 200, PlayerY = 485, PlayerWidth = 100, PlayerHeight = 10;
@@ -63,6 +68,7 @@ void GameEngine::GameLoop() {
         while (SDL_PollEvent(&e) != 0) { // 0 = no events to be processed
             game->HandleInput(game, e, running, keyboardState);
         }
+        game->HandleAI(1); // handles the AI of the paddle at index 1
         // BACKGROUND
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // R G B, Opaqueness
         SDL_RenderClear(renderer);                     // Clear the renderer once per frame
@@ -76,6 +82,7 @@ void GameEngine::GameLoop() {
 
 
         // controlling framerate
+        // GetTicks gives you the time since SDL_Init was called, it measures time
         FrameTime = SDL_GetTicks() - FrameStart; // Time taken for the frame
         if (FrameDelay > FrameTime) {
             SDL_Delay(FrameDelay - FrameTime); // Delay to maintain pre-determined FPS
