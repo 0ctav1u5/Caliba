@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Ball.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameEngine.cpp" />
@@ -142,6 +143,7 @@
     <ClCompile Include="Paddle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Ball.hpp" />
     <ClInclude Include="Bullet.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameEngine.hpp" />

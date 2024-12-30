@@ -5,6 +5,7 @@
 
 class Paddle {
 private:
+	int HP = 100; // base HP of 100
 	int R = 0, G = 0, B = 0;
 	int opaque = 255; // 255 = fully opaque, closer to 0 = more transparent
 	int posx, posy;
@@ -21,8 +22,11 @@ public:
 	void Move(int changex, int changey);
 
 	// util
+	void SetHP(int hp);
+	void DecreaseHP(int damage);
 	int GetX();
 	int GetY();
+	int GetHP();
 	int GetWidth();
 	int GetHeight();
 

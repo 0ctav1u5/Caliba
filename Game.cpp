@@ -6,16 +6,48 @@
 #include "Paddle.hpp"
 #include "Bullet.hpp"
 
-void Game::Render() {
+void Game::Render(SDL_Renderer* renderer) {
     if (!m_Paddles.empty()) {
         for (auto& paddle : m_Paddles) { // renders all paddles in the paddle vector
-            paddle->RenderPaddle(GetRenderer());
+            paddle->RenderPaddle(renderer);
         }
     }
 
     if (!m_Bullets.empty()) {
-        for (auto& bullet : m_Bullets) { // renders all bullets in the bullets vector
-            bullet->RenderBullet(GetRenderer()); 
+        for (int i = 0; i < m_Bullets.size(); ++i) {
+            Bullet* bullet = m_Bullets[i].get();  // Access bullet object from unique_ptr
+
+            if (bullet) {
+                // Move bullet upwards (adjust 5 based on the speed of the bullet)
+                bullet->Move(0, -5);
+
+                // Render bullet
+                bullet->RenderBullet(renderer);
+
+                // Get paddle properties (adjust index if more than one paddle exists)
+                int paddleY = m_Paddles[1]->GetY();  // Y position of the second paddle (AI paddle)
+                int bulletY = bullet->GetY();
+                int paddleX = m_Paddles[1]->GetX();
+                int paddleWidth = m_Paddles[1]->GetWidth();
+                int bulletX = bullet->GetX();
+                int paddleHeightfromTop = paddleY + m_Paddles[1]->GetHeight();
+
+                // Check for collision with the paddle
+                if (bulletY <= paddleY) {
+                    // If the bullet has reached the same Y position as the paddle, then remove it
+                    m_Bullets.erase(m_Bullets.begin() + i);
+                    --i;  // change index because of removal
+                    continue;  // no reason to keep checking this bullet so continue
+                }
+
+                // Check for a collision with the paddle area (
+                if (bulletY <= paddleHeightfromTop && bulletX >= paddleX && bulletX <= paddleX + paddleWidth) {
+                    m_Paddles[1]->DecreaseHP(10);
+                    std::cout << "Hit! HP: " << m_Paddles[1]->GetHP() << std::endl;
+                    m_Bullets.erase(m_Bullets.begin() + i);  // Remove the bullet after it hits the paddle
+                    --i;  // Adjust index due to removal of the bullet
+                }
+            }
         }
     }
 }
@@ -34,6 +66,14 @@ void Game::MakeBullet(int PlayerX, int PlayerY, int Player_Width, int Player_Hei
     m_Bullets.push_back(std::move(bullet)); // stores new paddle on the vector
 }
 
+// I will make 1 ball for now
+std::unique_ptr<Ball> Game::MakeBall(int PlayerX, int PlayerY, int Player_Width, int Player_Height) {
+    auto ball = std::make_unique<Ball>
+        (PlayerX, PlayerY, Player_Width, Player_Height);
+    ball->SetColour(186, 142, 35); // default colour of all balls is yellow
+    return ball;
+}
+
 void Game::RemoveBullet(int index) {
     if (index >= 0 && index < m_Bullets.size()) {
         m_Bullets.erase(m_Bullets.begin() + index); // Removes the bullet from the vector
@@ -45,17 +85,6 @@ Paddle* Game::GetPaddle(int i) {
         return m_Paddles[i].get();  // return raw pointer to the paddle
     }
     return nullptr;  // Return nullptr if index is out of bounds
-}
-
-Bullet* Game::GetBullet(int i) {
-    if (i >= 0 && i < m_Bullets.size()) {
-        return m_Bullets[i].get();  // Return raw pointer to the bullet
-    }
-    return nullptr;  // Return nullptr if index is out of bounds
-}
-
-int Game::GetBulletCount() const {
-    return m_Bullets.size();  // Return the number of bullets
 }
 
 void Game::HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
@@ -99,7 +128,7 @@ void Game::HandleAI(int paddlenum) {
     static int direction = 1;  // starts the direction to right
     // needs to be static as the memory needs to be remembered outside of scope
 
-    int speed = 5;           // Paddle speed per frame
+    int speed = 5; // Paddle speed per frame
 
     // Get the current paddle position
     int paddleX = m_Paddles[paddlenum]->GetX();

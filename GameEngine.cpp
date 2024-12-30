@@ -1,12 +1,14 @@
 #include <iostream>
 #include <SDL.h>
 #include <memory>
+#include <vector>
 #include "GameEngine.hpp"
 #include "Paddle.hpp"
 #include "Bullet.hpp"
+#include "Ball.hpp"
 #include "Game.hpp"
 
-int HP = 100;
+std::vector<std::unique_ptr<Ball>> v1;
 
 // boilerplate code for initialising framework, creating window and renderer
 bool GameEngine::Initialise() {
@@ -27,7 +29,6 @@ bool GameEngine::Initialise() {
         Cleanup("Error. Graphics could not be rendered!");
         return false;
     }
-
     return true;
 }
 
@@ -46,13 +47,17 @@ void GameEngine::GameLoop() {
     // PLAYER PADDLE
     game->MakePaddle(PlayerX, PlayerY, PlayerWidth, PlayerHeight);
 
-    // AI PADDLE
+    // AI PADDLE -- these will be changed later when levels are considered
     game->MakePaddle(PlayerX, PlayerY - 480, PlayerWidth, PlayerHeight);
-    game->GetPaddle(1)->SetColour(255, 0, 0);
+    game->GetPaddle(1)->SetColour(255, 0, 0); // needs to be set as default colour is blue
 
-    SDL_Event e;
+    // BALL
+    v1.push_back(game->MakeBall(250, 250, 35, PlayerHeight));
+
+    SDL_Event e; // for handling keyboard events
     const Uint8* keyboardState = SDL_GetKeyboardState(nullptr); // checks state to prevent lag
 
+    // for controlling frame rate
     const int FPS = 60;
     const int FrameDelay = 1000 / FPS;
     Uint32 FrameStart = 0;
@@ -61,52 +66,23 @@ void GameEngine::GameLoop() {
     while (running) {
         FrameStart = SDL_GetTicks();
         while (SDL_PollEvent(&e) != 0) { // 0 = no events to be processed
-            game->SetCoolDown(300); // cooldown can be changed at will
+            game->SetCoolDown(500); // cooldown can be changed at will
             game->HandleInput(game, e, running, keyboardState, renderer); // player input
         }
 
-        // Handle AI for chosen paddle
+        // Handle AI for chosen paddle -- this will be changed with levels
         game->HandleAI(1);
 
         // Clear the screen and render everything
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
         SDL_RenderClear(renderer);
 
-        // Render paddles
-        game->GetPaddle(0)->RenderPaddle(renderer);
-        game->GetPaddle(1)->RenderPaddle(renderer);
+        // Render game objects
+        game->Render(renderer);
 
+        // ball will be handled separately for now
+        v1[0]->RenderBall(renderer);
 
-        
-        // Render bullets
-        // How this works: 
-        for (int i = 0; i < game->GetBulletCount(); ++i) {
-            Bullet* bullet = game->GetBullet(i); // Use GetBullet() to access each bullet
-            int paddleY = game->GetPaddle(1)->GetY();
-            int bulletY = bullet->GetY();
-            int paddleX = game->GetPaddle(1)->GetX();
-            int paddleWidth = game->GetPaddle(1)->GetWidth();
-            int bulletX = bullet->GetX();
-            int paddleHeightfromTop = (paddleY + game->GetPaddle(1)->GetHeight());
-
-            if (bullet) {
-                bullet->Move(0, -5);  // Move bullet upwards
-                bullet->RenderBullet(renderer);
-            }
-            if (bulletY <= paddleY) {
-                game->RemoveBullet(i);
-                --i;
-                continue;
-            }
-            if (bulletY <= paddleHeightfromTop && ((bulletX >= paddleX) && (bulletX <= (paddleX + paddleWidth)))) {
-                HP -= 10;
-                std::cout << "Hit!" << " HP: " << HP << std::endl;
-                game->RemoveBullet(i);
-            }
-            if (HP <= 0) {
-                running = false;
-            }
-        }
         // Update the screen
         SDL_RenderPresent(renderer);
 
@@ -114,6 +90,9 @@ void GameEngine::GameLoop() {
         FrameTime = SDL_GetTicks() - FrameStart;
         if (FrameDelay > FrameTime) {
             SDL_Delay(FrameDelay - FrameTime); // Delay to maintain constant FPS
+        }
+        if ((game->GetPaddle(1)->GetHP() <= 0) || (game->GetPaddle(1)->GetHP() <= 0)) {
+            running = false;
         }
     }
 }
