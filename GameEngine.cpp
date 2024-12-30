@@ -6,6 +6,8 @@
 #include "Bullet.hpp"
 #include "Game.hpp"
 
+int HP = 100;
+
 // boilerplate code for initialising framework, creating window and renderer
 bool GameEngine::Initialise() {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -59,22 +61,12 @@ void GameEngine::GameLoop() {
     while (running) {
         FrameStart = SDL_GetTicks();
         while (SDL_PollEvent(&e) != 0) { // 0 = no events to be processed
-            game->SetCoolDown(300);
-            game->HandleInput(game, e, running, keyboardState, renderer);
+            game->SetCoolDown(300); // cooldown can be changed at will
+            game->HandleInput(game, e, running, keyboardState, renderer); // player input
         }
 
-        // Handle AI (if any AI exists)
+        // Handle AI for chosen paddle
         game->HandleAI(1);
-
-
-
-        // Move and render bullets -- if no bullets then bullet count remains 0, thus no loop
-        for (int i = 0; i < game->GetBulletCount(); ++i) {
-            Bullet* bullet = game->GetBullet(i); // Use GetBullet() to access each bullet
-            if (bullet) {
-                bullet->Move(0, -5);  // Move bullet upwards
-            }
-        }
 
         // Clear the screen and render everything
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
@@ -83,15 +75,38 @@ void GameEngine::GameLoop() {
         // Render paddles
         game->GetPaddle(0)->RenderPaddle(renderer);
         game->GetPaddle(1)->RenderPaddle(renderer);
+
+
         
         // Render bullets
+        // How this works: 
         for (int i = 0; i < game->GetBulletCount(); ++i) {
             Bullet* bullet = game->GetBullet(i); // Use GetBullet() to access each bullet
+            int paddleY = game->GetPaddle(1)->GetY();
+            int bulletY = bullet->GetY();
+            int paddleX = game->GetPaddle(1)->GetX();
+            int paddleWidth = game->GetPaddle(1)->GetWidth();
+            int bulletX = bullet->GetX();
+            int paddleHeightfromTop = (paddleY + game->GetPaddle(1)->GetHeight());
+
             if (bullet) {
+                bullet->Move(0, -5);  // Move bullet upwards
                 bullet->RenderBullet(renderer);
             }
+            if (bulletY <= paddleY) {
+                game->RemoveBullet(i);
+                --i;
+                continue;
+            }
+            if (bulletY <= paddleHeightfromTop && ((bulletX >= paddleX) && (bulletX <= (paddleX + paddleWidth)))) {
+                HP -= 10;
+                std::cout << "Hit!" << " HP: " << HP << std::endl;
+                game->RemoveBullet(i);
+            }
+            if (HP <= 0) {
+                running = false;
+            }
         }
-
         // Update the screen
         SDL_RenderPresent(renderer);
 

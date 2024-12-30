@@ -35,3 +35,7 @@ int Paddle::GetY() {
 int Paddle::GetWidth() {
 	return this->width;
 }
+
+int Paddle::GetHeight() {
+	return this->height;
+}

@@ -24,6 +24,7 @@ public:
 	int GetX();
 	int GetY();
 	int GetWidth();
+	int GetHeight();
 
 };
 

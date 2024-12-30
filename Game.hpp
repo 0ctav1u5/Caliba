@@ -20,17 +20,9 @@ private:
 	int cooldown; // cooldown time in milliseconds
 public:
 
-
-
-	void SetLastBulletTime(Uint32 lastbulletime) {
-		this->lastBulletTime = lastbulletime;
-	}
-
 	void SetCoolDown(int Cooldown) {
 		this->cooldown = Cooldown;
 	}
-
-
 
 	~Game() {
 		std::cout << "Game has been destroyed!" << std::endl;
@@ -38,6 +30,7 @@ public:
 
 	void MakePaddle(int PlayerX, int PlayerY, int Player_Width, int Player_Height);
 	void MakeBullet(int PlayerX, int PlayerY, int Player_Width, int Player_Height);
+	void RemoveBullet(int index);
 	Paddle* GetPaddle(int i);
 	Bullet* GetBullet(int i);
 	void HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
