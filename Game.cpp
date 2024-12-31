@@ -1,10 +1,12 @@
 #include <iostream>
 #include <SDL.h>
 #include <memory>
+#include <vector>
 #include <random>
 #include "Game.hpp"
 #include "Paddle.hpp"
 #include "Bullet.hpp"
+#include "Ball.hpp"
 
 void Game::Render(SDL_Renderer* renderer) {
     if (!m_Paddles.empty()) {
@@ -24,13 +26,9 @@ void Game::Render(SDL_Renderer* renderer) {
                 // Render bullet
                 bullet->RenderBullet(renderer);
 
-                // Get paddle properties (adjust index if more than one paddle exists)
-                int paddleY = m_Paddles[1]->GetY();  // Y position of the second paddle (AI paddle)
-                int bulletY = bullet->GetY();
-                int paddleX = m_Paddles[1]->GetX();
-                int paddleWidth = m_Paddles[1]->GetWidth();
-                int bulletX = bullet->GetX();
-                int paddleHeightfromTop = paddleY + m_Paddles[1]->GetHeight();
+                int paddleY = m_Paddles[1]->GetY(), bulletY = bullet->GetY();   // Y position of the second paddle (AI paddle)
+                int paddleX = m_Paddles[1]->GetX(), paddleWidth = m_Paddles[1]->GetWidth();
+                int bulletX = bullet->GetX(), paddleHeightfromTop = paddleY + m_Paddles[1]->GetHeight();
 
                 // Check for collision with the paddle
                 if (bulletY <= paddleY) {
@@ -116,7 +114,6 @@ void Game::HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
         int paddleX = m_Paddles[0]->GetX(); // gets x coords of the player's paddle
         int paddleY = m_Paddles[0]->GetY(); // gets y coords of the player's paddle
         int paddleWidth = m_Paddles[0]->GetWidth(); // width needed as well to centre bullet
-
         // Creates a new bullet each time the up key is pressed, slightly above the player's paddle
         MakeBullet(paddleX + paddleWidth / 2 - 1, paddleY - 13, 3, 13);
         lastBulletTime = currentTime; // sets currentTime to new oldtime
@@ -124,7 +121,7 @@ void Game::HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
 }
 
 // paddlenum will be whatever paddle we wish to handle stored in the vector
-void Game::HandleAI(int paddlenum) {
+void Game::HandleAI(int paddlenum, SDL_Renderer* renderer) {
     static int direction = 1;  // starts the direction to right
     // needs to be static as the memory needs to be remembered outside of scope
 
@@ -145,4 +142,20 @@ void Game::HandleAI(int paddlenum) {
     // direction is either 1 (right) or -1 (left) and the speed is how quickly it moves
     m_Paddles[paddlenum]->Move(direction * speed, 0); // (5, 0) moves 5 right per frame
     // notice how the coords are (x, 0) because x is being changed
+}
+
+
+void Game::LoadAssets(std::unique_ptr<Game>& game, std::vector<std::unique_ptr<Ball>>& v1) {
+    int PlayerX = 200, PlayerY = 485, PlayerWidth = 100, PlayerHeight = 10;
+    int AIX = 200, AIY = 5, AIWidth = 100, AIHeight = 10;
+
+    // PLAYER
+    game->MakePaddle(PlayerX, PlayerY, PlayerWidth, PlayerHeight);
+
+    // AI PADDLE -- these will be changed later when levels are considered
+    game->MakePaddle(AIX, AIY, AIWidth, AIHeight);
+    game->GetPaddle(1)->SetColour(255, 0, 0); // needs to be set as default colour is blue
+
+    // BALL
+    v1.push_back(game->MakeBall(250, 250, 35, PlayerHeight));
 }

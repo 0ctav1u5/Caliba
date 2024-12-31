@@ -8,7 +8,7 @@
 #include "Ball.hpp"
 #include "Game.hpp"
 
-std::vector<std::unique_ptr<Ball>> v1;
+
 
 // boilerplate code for initialising framework, creating window and renderer
 bool GameEngine::Initialise() {
@@ -33,45 +33,40 @@ bool GameEngine::Initialise() {
 }
 
 
+
+
 // note - we have to create at least two paddles for this code to function
 // i will soon implement functionality which handles <2 paddles
 
 
 void GameEngine::GameLoop() {
+    std::vector<std::unique_ptr<Ball>> v1; // using this vector for now
     bool running = true;
-    int PlayerX = 200, PlayerY = 485, PlayerWidth = 100, PlayerHeight = 10;
 
     // Game -- Handles game events
     std::unique_ptr<Game> game = std::make_unique<Game>();
 
-    // PLAYER PADDLE
-    game->MakePaddle(PlayerX, PlayerY, PlayerWidth, PlayerHeight);
-
-    // AI PADDLE -- these will be changed later when levels are considered
-    game->MakePaddle(PlayerX, PlayerY - 480, PlayerWidth, PlayerHeight);
-    game->GetPaddle(1)->SetColour(255, 0, 0); // needs to be set as default colour is blue
-
-    // BALL
-    v1.push_back(game->MakeBall(250, 250, 35, PlayerHeight));
+    game->LoadAssets(game, v1);
 
     SDL_Event e; // for handling keyboard events
     const Uint8* keyboardState = SDL_GetKeyboardState(nullptr); // checks state to prevent lag
 
     // for controlling frame rate
-    const int FPS = 60;
-    const int FrameDelay = 1000 / FPS;
+    const int FPS = 60, FrameDelay = 1000 / FPS;
     Uint32 FrameStart = 0;
     int FrameTime = 0;
 
+    // GAME LOOP
+
     while (running) {
         FrameStart = SDL_GetTicks();
+        game->SetCoolDown(500); // cooldown can be changed at will
         while (SDL_PollEvent(&e) != 0) { // 0 = no events to be processed
-            game->SetCoolDown(500); // cooldown can be changed at will
             game->HandleInput(game, e, running, keyboardState, renderer); // player input
         }
 
         // Handle AI for chosen paddle -- this will be changed with levels
-        game->HandleAI(1);
+        game->HandleAI(1, renderer);
 
         // Clear the screen and render everything
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
