@@ -22,3 +22,11 @@ int main(int argc, char* argv[]) {
     game->GameLoop();
     return 0;
 }
+
+
+
+// How to add an entity:
+// create the class for it with all its methods
+// call functions for it to be made in the load function (makeobject)
+// if it has AI properties, then handle that in the HandleAI function
+// now finally, include it in the render function to be rendered

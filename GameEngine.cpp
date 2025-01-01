@@ -40,13 +40,12 @@ bool GameEngine::Initialise() {
 
 
 void GameEngine::GameLoop() {
-    std::vector<std::unique_ptr<Ball>> v1; // using this vector for now
     bool running = true;
 
     // Game -- Handles game events
     std::unique_ptr<Game> game = std::make_unique<Game>();
 
-    game->LoadAssets(game, v1);
+    game->LoadAssets(game);
 
     SDL_Event e; // for handling keyboard events
     const Uint8* keyboardState = SDL_GetKeyboardState(nullptr); // checks state to prevent lag
@@ -61,6 +60,7 @@ void GameEngine::GameLoop() {
     while (running) {
         FrameStart = SDL_GetTicks();
         game->SetCoolDown(500); // cooldown can be changed at will
+        game->SetEnemyCooldown(400);
         while (SDL_PollEvent(&e) != 0) { // 0 = no events to be processed
             game->HandleInput(game, e, running, keyboardState, renderer); // player input
         }
@@ -68,15 +68,12 @@ void GameEngine::GameLoop() {
         // Handle AI for chosen paddle -- this will be changed with levels
         game->HandleAI(1, renderer);
 
-        // Clear the screen and render everything
+        // Clear the screen and render background
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
         SDL_RenderClear(renderer);
 
         // Render game objects
         game->Render(renderer);
-
-        // ball will be handled separately for now
-        v1[0]->RenderBall(renderer);
 
         // Update the screen
         SDL_RenderPresent(renderer);
@@ -86,7 +83,7 @@ void GameEngine::GameLoop() {
         if (FrameDelay > FrameTime) {
             SDL_Delay(FrameDelay - FrameTime); // Delay to maintain constant FPS
         }
-        if ((game->GetPaddle(1)->GetHP() <= 0) || (game->GetPaddle(1)->GetHP() <= 0)) {
+        if ((game->GetPaddle(0)->GetHP() <= 0) || (game->GetPaddle(1)->GetHP() <= 0)) {
             running = false;
         }
     }
