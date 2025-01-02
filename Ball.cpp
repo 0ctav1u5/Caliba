@@ -6,9 +6,9 @@
 void Ball::RenderBall(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, R, G, B, opaque);
 
-    int radius = width / 2; // Assuming the ball is circular
-    int centerX = posx;
-    int centerY = posy;
+    int radius = width / 2; // radius always = any point of the circumfrence to the centre point
+    int centreX = posx; // 
+    int centreY = posy;
 
     int x = radius;
     int y = 0;
@@ -16,10 +16,10 @@ void Ball::RenderBall(SDL_Renderer* renderer) {
 
     while (x >= y) {
         // Draw horizontal lines to fill the circle
-        SDL_RenderDrawLine(renderer, centerX - x, centerY + y, centerX + x, centerY + y);
-        SDL_RenderDrawLine(renderer, centerX - y, centerY + x, centerX + y, centerY + x);
-        SDL_RenderDrawLine(renderer, centerX - x, centerY - y, centerX + x, centerY - y);
-        SDL_RenderDrawLine(renderer, centerX - y, centerY - x, centerX + y, centerY - x);
+        SDL_RenderDrawLine(renderer, centreX - x, centreY + y, centreX + x, centreY + y);
+        SDL_RenderDrawLine(renderer, centreX - y, centreY + x, centreX + y, centreY + x);
+        SDL_RenderDrawLine(renderer, centreX - x, centreY - y, centreX + x, centreY - y);
+        SDL_RenderDrawLine(renderer, centreX - y, centreY - x, centreX + y, centreY - x);
 
         y++;
         if (decisionOver2 <= 0) {

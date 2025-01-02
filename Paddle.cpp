@@ -26,8 +26,9 @@ void Paddle::RenderPaddle(SDL_Renderer* renderer) {
 	SDL_RenderFillRect(renderer, &filledRect);
 }
 
-// pos x for a shape on the screen is the left most point of the object
-// pos y is the top left corner of the object 
+// THE COORDS OF ALL SHAPES ARE THE TOP DECIDED BY THE TOP LEFT CORNER OF THE SHAPE
+// I.E. THE X COORD WILL BE WHERE THE TOP LEFT CORNER OF THE SHAPE IS
+// AND THE Y COORD IS WHERE THE TOP LEFT CORNER OF THE SHAPE IS
 
 void Paddle::Move(int changex, int changey) {
 	posx += changex; // - x moves left, + x moves right 
