@@ -111,9 +111,9 @@ void Game::MakeEnemyBullet(int PlayerX, int PlayerY, int Player_Width, int Playe
     m_EnemyBullets.push_back(std::move(bullet)); // stores new paddle on the vector
 }
 
-void Game::MakeBall(int PlayerX, int PlayerY, int Player_Width, int Player_Height) {
+void Game::MakeBall(int PlayerX, int PlayerY, int Player_Width) {
     auto ball = std::make_unique<Ball> // dynamically stored object (not pointer)
-        (PlayerX, PlayerY, Player_Width, Player_Height);
+        (PlayerX, PlayerY, Player_Width);
     ball->SetColour(0, 0, 255); // default colour of all balls is blue
     m_Balls.push_back(std::move(ball)); // stores new ball on the vector
 }
@@ -177,7 +177,7 @@ void Game::HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
 // paddlenum will be whatever paddle we wish to handle stored in the vector
 void Game::HandleAI(int paddlenum, SDL_Renderer* renderer) {
     std::random_device rd;
-    std::uniform_int_distribution<int> dist(1, 30);
+    std::uniform_int_distribution<int> dist(1, 40);
     int randomizer = dist(rd);
     static int direction = 1;  // starts the direction to right
     int speed = 5; // Paddle speed per frame
@@ -195,10 +195,10 @@ void Game::HandleAI(int paddlenum, SDL_Renderer* renderer) {
 
     // direction is either 1 (right) or -1 (left) and 1 x 5 is 5 or -1 x 5 is -5
     // it's a neat little trick to have a speed be involved
-    if (randomizer < 30) {
+    if (randomizer < 40) {
         m_Paddles[paddlenum]->Move(direction * speed, 0);
     }
-    else if (randomizer == 30) {
+    else if (randomizer == 40) {
         if (direction == 1) {
             direction = -1;
             m_Paddles[paddlenum]->Move(direction * speed, 0);
@@ -239,6 +239,6 @@ void Game::LoadAssets(std::unique_ptr<Game>& game) {
     game->GetPaddle(1)->SetColour(255, 0, 0); // needs to be set as default colour is blue
 
     // BALL
-    game->MakeBall(250, 250, 50, 50);
+    game->MakeBall(250, 250, 20); // posx, posy, width
     game->GetBall(0)->SetColour(140, 146, 172);
 }

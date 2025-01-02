@@ -6,28 +6,45 @@
 void Ball::RenderBall(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, R, G, B, opaque);
 
-    int radius = width / 2; // radius always = any point of the circumfrence to the centre point
-    int centreX = posx; // 
+    int radius = width / 2; 
+    int centreX = posx; 
     int centreY = posy;
 
     int x = radius;
     int y = 0;
-    int decisionOver2 = 1 - x; // Decision parameter
+    int decisionmaker = 1 - x; // Decision parameter
 
     while (x >= y) {
-        // Draw horizontal lines to fill the circle
+        // PosX = 250, PosY = 250, Width = 20, radius = 10, centre point (250, 250)
+        // far right point (260, 250), far left point (240, 250)
+        // X: 250 - 10 = 240, Y: 250 + 0 = 250; X: 250 + 10 = 260, Y: 250 + 0 = 250 
+        // first point: {240, 250} second point: {260, 250}
+        // this creates a horizontal line from the far left point to a far left point
         SDL_RenderDrawLine(renderer, centreX - x, centreY + y, centreX + x, centreY + y);
+
+
+        // 250 - 0, 250 + 10 = {250, 260}; 250 + 0, 250 + 10 = {250, 260}
+        // no line drawn in the first iteration, changes when y is incremented
         SDL_RenderDrawLine(renderer, centreX - y, centreY + x, centreX + y, centreY + x);
+
+        // 250 - 10, 250 - 0 = {240, 250}; 250 + 10, 250 - 0 = {260, 250}
+        // another horizontal line going from the far left point to the far right point
         SDL_RenderDrawLine(renderer, centreX - x, centreY - y, centreX + x, centreY - y);
+
+        // 250 - 0, 250 - 10 = {250, 240}; 250 + 0, 250 - 10 = {250, 240}
+        // no line is drawn during the first iteration
+        // In subsequent iterations, the line moves downward, forming the bottom half of the circle.
         SDL_RenderDrawLine(renderer, centreX - y, centreY - x, centreX + y, centreY - x);
 
-        y++;
-        if (decisionOver2 <= 0) {
-            decisionOver2 += 2 * y + 1;
+        // 4 lines in total
+
+        y++; // y gets incremented if either rule is true
+        if (decisionmaker <= 0) { // this part here tells the program if more points need plotting
+            decisionmaker += 2 * y + 1;
         }
         else {
             x--;
-            decisionOver2 += 2 * (y - x) + 1;
+            decisionmaker += 2 * (y - x) + 1;
         }
     }
 }
@@ -51,8 +68,4 @@ int Ball::GetY() {
 
 int Ball::GetWidth() {
 	return this->width;
-}
-
-int Ball::GetHeight() {
-	return this->height;
 }

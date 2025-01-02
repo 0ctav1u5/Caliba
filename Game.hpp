@@ -42,7 +42,7 @@ public:
 	void MakePaddle(int PlayerX, int PlayerY, int Player_Width, int Player_Height);
 	void MakeBullet(int PlayerX, int PlayerY, int Player_Width, int Player_Height);
 	void MakeEnemyBullet(int PlayerX, int PlayerY, int Player_Width, int Player_Height);
-	void MakeBall(int PlayerX, int PlayerY, int Player_Width, int Player_Height);
+	void MakeBall(int PlayerX, int PlayerY, int Player_Width);
 	void RemoveBullet(int index);
 	Paddle* GetPaddle(int i);
 	Ball* GetBall(int i);
