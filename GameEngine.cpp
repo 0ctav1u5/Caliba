@@ -60,13 +60,13 @@ void GameEngine::GameLoop() {
     while (running) {
         FrameStart = SDL_GetTicks();
         game->SetCoolDown(500); // cooldown can be changed at will
-        game->SetEnemyCooldown(400);
+        game->SetEnemyCooldown(600);
         while (SDL_PollEvent(&e) != 0) { // 0 = no events to be processed
             game->HandleInput(game, e, running, keyboardState, renderer); // player input
         }
 
         // Handle AI for chosen paddle -- this will be changed with levels
-        game->HandleAI(1, renderer);
+        game->HandleAI(1, 0, renderer);
 
         // Clear the screen and render background
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background

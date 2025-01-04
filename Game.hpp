@@ -49,7 +49,7 @@ public:
 	void HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
 		bool& running, const Uint8* keyboardState, SDL_Renderer* renderer);
 	void Render(SDL_Renderer* renderer);
-	void HandleAI(int paddlenum, SDL_Renderer* renderer);
+	void HandleAI(int paddlenum, int ballnum, SDL_Renderer* renderer);
 };
 
 #endif

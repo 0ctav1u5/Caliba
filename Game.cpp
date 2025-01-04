@@ -9,6 +9,14 @@
 #include "Ball.hpp"
 
 void Game::Render(SDL_Renderer* renderer) {
+    static int oldTime = 0;
+    int newTime = SDL_GetTicks();
+    static const int cooldown = 750;
+
+    
+
+    // newtime - oldtime = difference
+
     if (!m_Paddles.empty()) {
         for (auto& paddle : m_Paddles) { // renders all paddles in the paddle vector
             paddle->RenderPaddle(renderer);
@@ -16,7 +24,7 @@ void Game::Render(SDL_Renderer* renderer) {
     }
 
     if (!m_Balls.empty()) {
-        for (auto& ball : m_Balls) { // renders all paddles in the paddle vector
+        for (auto& ball : m_Balls) {
             ball->RenderBall(renderer);
         }
     }
@@ -46,6 +54,9 @@ void Game::Render(SDL_Renderer* renderer) {
 
                 // Check for a collision with the paddle area (
                 if (bulletY <= paddleHeightfromTop && bulletX >= paddleX && bulletX <= paddleX + paddleWidth) {
+                    GetPaddle(1)->SetColour(100, 0, 0);
+
+               
                     m_Paddles[1]->DecreaseHP(10);
                     std::cout << "Hit! HP: " << m_Paddles[1]->GetHP() << std::endl;
                     m_Bullets.erase(m_Bullets.begin() + i);  // Remove the bullet after it hits the paddle
@@ -79,7 +90,7 @@ void Game::Render(SDL_Renderer* renderer) {
                 }
 
                 // bulletY <= paddleHeightfromTop && bulletX >= paddleX && bulletX <= paddleX + paddleWidth
-                if (bulletY >= paddleHeightfromBottom && bulletX >= paddleX && bulletX <= paddleX + paddleWidth) {
+                if (bulletY >= paddleHeightfromBottom && bulletX >= paddleX && bulletX <= paddleX + paddleWidth) {                           
                     m_Paddles[0]->DecreaseHP(10);
                     std::cout << "Enemy Hit you! HP: " << m_Paddles[0]->GetHP() << std::endl;
                     m_EnemyBullets.erase(m_EnemyBullets.begin() + i);  // Remove the bullet after it hits the paddle
@@ -87,6 +98,11 @@ void Game::Render(SDL_Renderer* renderer) {
                 }
             }
         }
+    }
+
+    if (newTime - oldTime >= cooldown) {
+        GetPaddle(1)->SetColour(255, 0, 0);
+        oldTime = newTime;
     }
 }
 
@@ -147,13 +163,13 @@ void Game::HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
 
     if (keyboardState[SDL_SCANCODE_LEFT]) { // Check if LEFT arrow is held
         if (m_Paddles[0]->GetX() >= 10) { // Ensure paddle doesn't move off-screen
-            m_Paddles[0]->Move(-10, 0);
+            m_Paddles[0]->Move(-20, 0);
         }
     }
 
     if (keyboardState[SDL_SCANCODE_RIGHT]) { // Check if RIGHT arrow is held
         if (m_Paddles[0]->GetX() + m_Paddles[0]->GetWidth() < GetWindowWidth()) { // Ensure paddle stays within bounds
-            m_Paddles[0]->Move(10, 0);
+            m_Paddles[0]->Move(20, 0);
         }
     }
     Uint32 currentTime = SDL_GetTicks(); // gets current game time since SDL_init was called
@@ -175,10 +191,11 @@ void Game::HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
 }
 
 // paddlenum will be whatever paddle we wish to handle stored in the vector
-void Game::HandleAI(int paddlenum, SDL_Renderer* renderer) {
+void Game::HandleAI(int paddlenum, int ballnum, SDL_Renderer* renderer) {
     std::random_device rd;
+    std::mt19937 rng1(rd());
     std::uniform_int_distribution<int> dist(1, 40);
-    int randomizer = dist(rd);
+    int randomizer = dist(rng1);
     static int direction = 1;  // starts the direction to right
     int speed = 5; // Paddle speed per frame
 
@@ -224,6 +241,51 @@ void Game::HandleAI(int paddlenum, SDL_Renderer* renderer) {
         MakeEnemyBullet(paddleX + paddleWidth / 2 - 1, paddleY + 13, 3, 13);
         lastEnemyBulletTime = currentTime; // sets currentTime to new oldtime
     }
+
+
+    // LOGIC FOR MOVING THE BALL 1
+
+
+    int ballX = m_Balls[ballnum]->GetX(); 
+    int ballY = m_Balls[ballnum]->GetY();
+    int ballWidth = m_Balls[ballnum]->GetWidth();
+
+    static float balldirectionY = 0, balldirectionX = 1, ballspeed = 3;
+
+    std::random_device rd2;
+    std::mt19937 rng(rd2());
+    std::uniform_real_distribution<float> bounce(-0.5, 0.5);
+
+    if (ballX <= 0) { // left border
+        balldirectionX = 1;
+        balldirectionY = bounce(rng);
+    }
+    else if (ballX + ballWidth >= GetWindowWidth() + 20) { // right border
+        balldirectionX = -1;
+        balldirectionY = bounce(rng);
+    }
+    else if (ballY < 0) { // top border
+        balldirectionY = 1;
+        balldirectionX = bounce(rng);
+
+    }
+    else if (ballY + ballWidth > 510) { // bottom border
+        balldirectionY = -1;
+        balldirectionX = bounce(rng);
+    }
+
+    int paddleY = m_Paddles[0]->GetY();
+    int paddleHeightfromBottom = paddleY - m_Paddles[0]->GetHeight();
+    int PlayerHP = m_Paddles[0]->GetHP();;
+    // bulletY >= paddleHeightfromBottom && bulletX >= paddleX && bulletX <= paddleX + paddleWidth
+    
+    // kill effect
+    if (ballY >= paddleHeightfromBottom && (ballX >= m_Paddles[0]->GetX() && ballX <= m_Paddles[0]->GetX() + m_Paddles[0]->GetWidth())) {
+        m_Paddles[0]->SetHP(0);
+    }
+
+    m_Balls[ballnum]->Move(balldirectionX * ballspeed, balldirectionY * ballspeed);
+
 }
 
 
@@ -239,6 +301,6 @@ void Game::LoadAssets(std::unique_ptr<Game>& game) {
     game->GetPaddle(1)->SetColour(255, 0, 0); // needs to be set as default colour is blue
 
     // BALL
-    game->MakeBall(250, 250, 20); // posx, posy, width
-    game->GetBall(0)->SetColour(140, 146, 172);
+    game->MakeBall(250, 250, 30); // posx, posy, width
+    game->GetBall(0)->SetColour(204, 85, 0);
 }

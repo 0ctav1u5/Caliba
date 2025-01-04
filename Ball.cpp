@@ -53,7 +53,7 @@ void Ball::SetColour(int R, int G, int B) {
 	this->R = R, this->G = G, this->B = B;
 }
 
-void Ball::Move(int changex, int changey) {
+void Ball::Move(float changex, float changey) {
 	posx += changex; 
     posy += changey;
 }
