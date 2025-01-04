@@ -1,19 +1,16 @@
-#include <iostream>
-#include <SDL.h>
-#include <vector>
-#include "GameEngine.hpp"
-#include "Paddle.hpp"
-#include "Bullet.hpp"
-#include "Ball.hpp"
 #ifndef GAME_HPP
 #define GAME_HPP
 
-
-
+#include <SDL.h>
+#include <vector>
+#include <memory>
+#include "Paddle.hpp"
+#include "Bullet.hpp"
+#include "Ball.hpp"
 
 // I will use this class for all high level entities in the game
 
-class Game : public GameEngine {
+class Game {
 private:
 	std::vector<std::unique_ptr<Paddle>> m_Paddles;
 	std::vector<std::unique_ptr<Bullet>> m_Bullets;
@@ -37,8 +34,8 @@ public:
 	~Game() {
 		std::cout << "Game has been destroyed!" << std::endl;
 	}
-
-	void LoadAssets(std::unique_ptr<Game>& game);
+	void Render(SDL_Renderer* renderer);
+	bool LoadAssets();
 	void MakePaddle(int PlayerX, int PlayerY, int Player_Width, int Player_Height);
 	void MakeBullet(int PlayerX, int PlayerY, int Player_Width, int Player_Height);
 	void MakeEnemyBullet(int PlayerX, int PlayerY, int Player_Width, int Player_Height);
@@ -47,9 +44,10 @@ public:
 	Paddle* GetPaddle(int i);
 	Ball* GetBall(int i);
 	void HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
-		bool& running, const Uint8* keyboardState, SDL_Renderer* renderer);
-	void Render(SDL_Renderer* renderer);
-	void HandleAI(int paddlenum, int ballnum, SDL_Renderer* renderer);
+		bool& running, const Uint8* keyboardState, SDL_Renderer* renderer,
+		const int Window_Width, const int Window_Height);
+	void HandleAI(int paddlenum, int ballnum, SDL_Renderer* renderer, const int m_WINDOW_WIDTH,
+		const int m_WINDOW_HEIGHT);
 };
 
 #endif

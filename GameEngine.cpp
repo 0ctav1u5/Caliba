@@ -8,9 +8,6 @@
 #include "Ball.hpp"
 #include "Game.hpp"
 
-
-
-// boilerplate code for initialising framework, creating window and renderer
 bool GameEngine::Initialise() {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         Cleanup("Error. Failed to initialise!");
@@ -29,25 +26,20 @@ bool GameEngine::Initialise() {
         Cleanup("Error. Graphics could not be rendered!");
         return false;
     }
+    game = std::make_unique<Game>();
+    if (!game->LoadAssets()) {
+        Cleanup("Error. Failed to load game assets!");
+        return false;
+    }
     return true;
 }
-
-
-
-
-// note - we have to create at least two paddles for this code to function
-// i will soon implement functionality which handles <2 paddles
 
 
 void GameEngine::GameLoop() {
     bool running = true;
 
-    // Game -- Handles game events
-    std::unique_ptr<Game> game = std::make_unique<Game>();
 
-    game->LoadAssets(game);
-
-    SDL_Event e; // for handling keyboard events
+    SDL_Event e; // for handling my keyboard events
     const Uint8* keyboardState = SDL_GetKeyboardState(nullptr); // checks state to prevent lag
 
     // for controlling frame rate
@@ -59,14 +51,14 @@ void GameEngine::GameLoop() {
 
     while (running) {
         FrameStart = SDL_GetTicks();
-        game->SetCoolDown(500); // cooldown can be changed at will
+        game->SetCoolDown(500); // cooldown for bullet rate, increase for slower bullet production
         game->SetEnemyCooldown(600);
         while (SDL_PollEvent(&e) != 0) { // 0 = no events to be processed
-            game->HandleInput(game, e, running, keyboardState, renderer); // player input
+            game->HandleInput(game, e, running, keyboardState, renderer, m_WINDOW_WIDTH, m_WINDOW_HEIGHT); // player input
         }
 
         // Handle AI for chosen paddle -- this will be changed with levels
-        game->HandleAI(1, 0, renderer);
+        game->HandleAI(1, 0, renderer, m_WINDOW_WIDTH, m_WINDOW_HEIGHT);
 
         // Clear the screen and render background
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
@@ -91,6 +83,9 @@ void GameEngine::GameLoop() {
 
 const int GameEngine::GetWindowWidth() {
     return m_WINDOW_WIDTH;
+}
+const int GameEngine::GetWindowHeight() {
+    return m_WINDOW_HEIGHT;
 }
 
 SDL_Renderer* GameEngine::GetRenderer() const {

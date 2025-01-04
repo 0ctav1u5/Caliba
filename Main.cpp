@@ -14,7 +14,7 @@
 int main(int argc, char* argv[]) {
 
     // smart pointer because I don't want to worry about freeing memory
-    std::unique_ptr<GameEngine> game = std::make_unique<Game>();
+    std::unique_ptr<GameEngine> game = std::make_unique<GameEngine>();
     if (!game->Initialise()) {
         std::cerr << "Game Engine could not be initialised!" << std::endl;
         return -1;

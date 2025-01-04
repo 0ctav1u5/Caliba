@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include <random>
+#include "GameEngine.hpp"
 #include "Game.hpp"
 #include "Paddle.hpp"
 #include "Bullet.hpp"
@@ -156,7 +157,8 @@ Ball* Game::GetBall(int i) {
 }
 
 void Game::HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
-    bool& running, const Uint8* keyboardState, SDL_Renderer* renderer) {
+    bool& running, const Uint8* keyboardState, SDL_Renderer* renderer,
+    const int Window_Width, const int Window_Height) {
     if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)) {
         running = false;
     }
@@ -168,7 +170,7 @@ void Game::HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
     }
 
     if (keyboardState[SDL_SCANCODE_RIGHT]) { // Check if RIGHT arrow is held
-        if (m_Paddles[0]->GetX() + m_Paddles[0]->GetWidth() < GetWindowWidth()) { // Ensure paddle stays within bounds
+        if (m_Paddles[0]->GetX() + m_Paddles[0]->GetWidth() < Window_Width) { // Ensure paddle stays within bounds
             m_Paddles[0]->Move(20, 0);
         }
     }
@@ -191,7 +193,8 @@ void Game::HandleInput(std::unique_ptr<Game>& game, SDL_Event e,
 }
 
 // paddlenum will be whatever paddle we wish to handle stored in the vector
-void Game::HandleAI(int paddlenum, int ballnum, SDL_Renderer* renderer) {
+void Game::HandleAI(int paddlenum, int ballnum, SDL_Renderer* renderer, const int Window_Width, 
+    const int Window_Height) {
     std::random_device rd;
     std::mt19937 rng1(rd());
     std::uniform_int_distribution<int> dist(1, 40);
@@ -206,7 +209,7 @@ void Game::HandleAI(int paddlenum, int ballnum, SDL_Renderer* renderer) {
     if (paddleX <= 0) { // if x is 0, then the paddle is the furthest point left
         direction = 1; // move paddle right
     }
-    else if (paddleX + paddleWidth >= GetWindowWidth()) { // windowWidth is the furthers point right
+    else if (paddleX + paddleWidth >= Window_Width) { // windowWidth is the furthers point right
         direction = -1; // move paddle left
     }
 
@@ -260,7 +263,7 @@ void Game::HandleAI(int paddlenum, int ballnum, SDL_Renderer* renderer) {
         balldirectionX = 1;
         balldirectionY = bounce(rng);
     }
-    else if (ballX + ballWidth >= GetWindowWidth() + 20) { // right border
+    else if (ballX + ballWidth >= Window_Width + 20) { // right border
         balldirectionX = -1;
         balldirectionY = bounce(rng);
     }
@@ -289,18 +292,25 @@ void Game::HandleAI(int paddlenum, int ballnum, SDL_Renderer* renderer) {
 }
 
 
-void Game::LoadAssets(std::unique_ptr<Game>& game) {
+bool Game::LoadAssets() {
     int PlayerX = 200, PlayerY = 485, PlayerWidth = 100, PlayerHeight = 10;
     int AIX = 200, AIY = 5, AIWidth = 100, AIHeight = 10;
 
-    // PLAYER
-    game->MakePaddle(PlayerX, PlayerY, PlayerWidth, PlayerHeight);
+    try {
+        // PLAYER
+        MakePaddle(PlayerX, PlayerY, PlayerWidth, PlayerHeight);
 
-    // AI PADDLE -- these will be changed later when levels are considered
-    game->MakePaddle(AIX, AIY, AIWidth, AIHeight);
-    game->GetPaddle(1)->SetColour(255, 0, 0); // needs to be set as default colour is blue
+        // AI PADDLE -- these will be changed later when levels are considered
+        MakePaddle(AIX, AIY, AIWidth, AIHeight);
+        GetPaddle(1)->SetColour(255, 0, 0); // needs to be set as default colour is blue
 
-    // BALL
-    game->MakeBall(250, 250, 30); // posx, posy, width
-    game->GetBall(0)->SetColour(204, 85, 0);
+        // BALL
+        MakeBall(250, 250, 30); // posx, posy, width
+        GetBall(0)->SetColour(204, 85, 0);
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Assets failed to load, error: " << e.what() << " was caught!" << std::endl;
+        return false;
+    }
+    return true;
 }

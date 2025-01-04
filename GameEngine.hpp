@@ -1,7 +1,10 @@
-#include <iostream>
-#include <SDL.h>
 #ifndef GAME_ENGINE_HPP
 #define GAME_ENGINE_HPP
+#include <iostream>
+#include <SDL.h>
+#include "Game.hpp"
+
+class Game;
 
 
 
@@ -15,9 +18,10 @@ private:
 	const char* m_WINDOW_NAME = "Caliba";
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
+	std::unique_ptr<Game> game;
 public:
 
-	virtual ~GameEngine(){
+	   ~GameEngine(){
 		std::cout << "GameEngine has been destroyed!" << std::endl;
 		if (renderer != nullptr) {
 			SDL_DestroyRenderer(renderer);
@@ -31,10 +35,9 @@ public:
 	bool Initialise();
 	void GameLoop();
 	const int GetWindowWidth();
+	const int GetWindowHeight();
 	SDL_Renderer* GetRenderer() const;
 	void Cleanup(const std::string& errormsg);
-
-
 };
 
 
