@@ -287,8 +287,26 @@ void Game::HandleAI(int paddlenum, int ballnum, SDL_Renderer* renderer, const in
         m_Paddles[0]->SetHP(0);
     }
 
-    m_Balls[ballnum]->Move(balldirectionX * ballspeed, balldirectionY * ballspeed);
+    std::random_device ballrandom;
+    std::uniform_int_distribution<int> ballrange(1, 75);
+    int ballrand = ballrange(ballrandom);
+    if (ballrand < 75) {
+        m_Balls[ballnum]->Move(balldirectionX * ballspeed, balldirectionY * ballspeed);
+    }
+    else {
+        m_Balls[ballnum]->SetColour(255, 85, 0);
+        m_Balls[ballnum]->Move(balldirectionX * 10, balldirectionY * 10);
+    }
 
+    static int oldTime = 0;
+    int newTime = SDL_GetTicks();
+    static const int cooldown = 750;
+
+
+    if (newTime - oldTime >= cooldown) {
+        m_Balls[ballnum]->SetColour(204, 85, 0);
+        oldTime = newTime;
+    }
 }
 
 
