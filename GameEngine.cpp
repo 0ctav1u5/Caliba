@@ -2,6 +2,7 @@
 #include <SDL.h>
 #include <memory>
 #include <vector>
+#include <random>
 #include "GameEngine.hpp"
 #include "Paddle.hpp"
 #include "Bullet.hpp"
@@ -38,7 +39,6 @@ bool GameEngine::Initialise() {
 void GameEngine::GameLoop() {
     bool running = true;
 
-
     SDL_Event e; // for handling my keyboard events
     const Uint8* keyboardState = SDL_GetKeyboardState(nullptr); // checks state to prevent lag
 
@@ -60,9 +60,7 @@ void GameEngine::GameLoop() {
         // Handle AI for chosen paddle -- this will be changed with levels
         game->HandleAI(1, 0, renderer, m_WINDOW_WIDTH, m_WINDOW_HEIGHT);
 
-        // Clear the screen and render background
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
-        SDL_RenderClear(renderer);
+        DrawBackground();
 
         // Render game objects
         game->Render(renderer);
@@ -78,6 +76,38 @@ void GameEngine::GameLoop() {
         if ((game->GetPaddle(0)->GetHP() <= 0) || (game->GetPaddle(1)->GetHP() <= 0)) {
             running = false;
         }
+    }
+}
+
+void GameEngine::DrawBackground() {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // RGB for black
+    SDL_RenderClear(renderer); // Clear the screen with black
+
+    static std::vector<SDL_Point> stars; // vector of SDL points (SDL points are stored
+    // (like this {x, y} so vector would look like {{x, y}, {x, y}...}
+
+    // Only generate stars once
+    if (stars.empty()) { // if vector is empty then
+        std::random_device rd;
+        std::mt19937 gen(rd()); // random seed generator
+        std::uniform_int_distribution<int> distX(0, m_WINDOW_WIDTH); // 0-500
+        std::uniform_int_distribution<int> distY(0, m_WINDOW_HEIGHT); // 0-500
+
+        // Constant number of starts
+        const int NUM_STARS = 150;
+        for (int i = 0; i < NUM_STARS; ++i) {
+            SDL_Point star = { distX(gen), distY(gen) }; // x = 0-500, y = 0-500;
+            // starts are plotted sporadically at random locations 150 times
+            stars.push_back(star); // pushes all stars to the back of the vector
+        }
+    }
+
+    // Set the drawing color for stars
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    // Draw all the stars
+    for (const auto& star : stars) { // for each loop for looping through vector
+        SDL_RenderDrawPoint(renderer, star.x, star.y); // {x, y} are SDL points
     }
 }
 

@@ -56,8 +56,6 @@ void Game::Render(SDL_Renderer* renderer) {
                 // Check for a collision with the paddle area (
                 if (bulletY <= paddleHeightfromTop && bulletX >= paddleX && bulletX <= paddleX + paddleWidth) {
                     GetPaddle(1)->SetColour(100, 0, 0);
-
-               
                     m_Paddles[1]->DecreaseHP(10);
                     std::cout << "Hit! HP: " << m_Paddles[1]->GetHP() << std::endl;
                     m_Bullets.erase(m_Bullets.begin() + i);  // Remove the bullet after it hits the paddle
@@ -93,6 +91,7 @@ void Game::Render(SDL_Renderer* renderer) {
                 // bulletY <= paddleHeightfromTop && bulletX >= paddleX && bulletX <= paddleX + paddleWidth
                 if (bulletY >= paddleHeightfromBottom && bulletX >= paddleX && bulletX <= paddleX + paddleWidth) {                           
                     m_Paddles[0]->DecreaseHP(10);
+                    GetPaddle(0)->SetColour(0, 0, 100);
                     std::cout << "Enemy Hit you! HP: " << m_Paddles[0]->GetHP() << std::endl;
                     m_EnemyBullets.erase(m_EnemyBullets.begin() + i);  // Remove the bullet after it hits the paddle
                     --i;  // Adjust index due to removal of the bullet
@@ -102,6 +101,7 @@ void Game::Render(SDL_Renderer* renderer) {
     }
 
     if (newTime - oldTime >= cooldown) {
+        GetPaddle(0)->SetColour(0, 0, 255);
         GetPaddle(1)->SetColour(255, 0, 0);
         oldTime = newTime;
     }

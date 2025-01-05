@@ -38,6 +38,7 @@ public:
 	const int GetWindowHeight();
 	SDL_Renderer* GetRenderer() const;
 	void Cleanup(const std::string& errormsg);
+	void DrawBackground();
 };
 
 
